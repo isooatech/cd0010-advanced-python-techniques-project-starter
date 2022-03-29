@@ -30,6 +30,20 @@ def write_to_csv(results, filename):
     )
     # TODO: Write the results to a CSV file, following the specification in the instructions.
 
+    with open(filename, "w", newline="") as outfile:
+        writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for result in results:
+            content = {**result, **result.neo}
+            if content["name"] is not None:
+                content["name"] = content["name"]
+            else:
+                content["name"] = ""
+            if content["potentially_hazardous"]:
+                content["potentially_hazardous"] = "True"
+            else:
+                content["potentially_hazardous"] = "False"
+            writer.writerow(content)
 
 def write_to_json(results, filename):
     """Write an iterable of `CloseApproach` objects to a JSON file.
@@ -43,3 +57,28 @@ def write_to_json(results, filename):
     :param filename: A Path-like object pointing to where the data should be saved.
     """
     # TODO: Write the results to a JSON file, following the specification in the instructions.
+
+    data = []
+    for result in results:
+        content = {**result, **result.neo}
+        if content["name"] is not None:
+            content["name"] = content["name"]
+        else:
+            content["name"] = ""
+        if content["potentially_hazardous"]:
+            content["potentially_hazardous"] = "True"
+        else:
+            content["potentially_hazardous"] = "False"
+        data.append(
+            {
+                "datetime_utc": content["datetime_utc"],
+                "distance_au": content["distance_au"],
+                "velocity_km_s": content["velocity_km_s"],
+                "neo": {
+                    "designation": content["designation"],
+                    "name": content["name"],
+                    "diameter_km": content["diameter_km"],
+                    "potentially_hazardous": content["potentially_hazardous"],
+                },
+            }
+        )
