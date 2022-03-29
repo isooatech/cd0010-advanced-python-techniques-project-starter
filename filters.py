@@ -72,64 +72,133 @@ class AttributeFilter:
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
 
+class DateTypeFilter(AttributeFilter):
+    """A subclass that creates objects of the date related filters"""
+
+    @classmethod
+    def get(cls,approach):
+        """This will accept an approach object and return the time of the approach in the required format
+        Args: A close approach == approach
+
+        Returns time in date format
+        """
+        return approach.time.date()
+
+class DistanceTypeFilter(AttributeFilter):
+    """A subclass that creates objects of the distance related filters"""
+
+    @classmethod
+    def get(cls,approach):
+        """This will accept an approach object and return the distance of the approach in the required format
+                Args: A close approach == approach
+
+                Returns the distance of the approach
+                """
+
+        return approach.distance
+
+
+class VelocityTypeFilter(AttributeFilter):
+    """A subclass that creates objects of the velocity related filters"""
+
+    @classmethod
+    def get(cls, approach):
+        """This will accept an approach object and return the velocity of the approach in the required format
+                Args: A close approach == approach
+
+                Returns the velocity of the approach
+                """
+
+        return approach.velocity
+
+class DiameterTypeFilter(AttributeFilter):
+    """A subclass that creates objects of the diameter related filters"""
+
+    @classmethod
+    def get(cls, approach):
+        """This will accept an approach object and return the diameter of the approach in the required format
+                Args: A close approach == approach
+
+                Returns the diameter of the approach
+                """
+
+        return approach.neo.diameter
+
+class HazardTypeFilter(AttributeFilter):
+    """A subclass that creates objects of the hazard related filters"""
+
+    @classmethod
+    def get(cls, approach):
+        """This will accept an approach object and return the hazard status of the approach in the required format
+                Args: A close approach == approach
+
+                Returns the hazard status of the approach
+                """
+
+        return approach.neo.hazardous
+
 def create_filters(
-        date=None, start_date=None, end_date=None,
-        distance_min=None, distance_max=None,
-        velocity_min=None, velocity_max=None,
-        diameter_min=None, diameter_max=None,
-        hazardous=None
-):
+            date=None, start_date=None, end_date=None,
+            distance_min=None, distance_max=None,
+            velocity_min=None, velocity_max=None,
+            diameter_min=None, diameter_max=None,
+            hazardous=None ):
     """Create a collection of filters from user-specified criteria.
 
-    Each of these arguments is provided by the main module with a value from the
-    user's options at the command line. Each one corresponds to a different type
-    of filter. For example, the `--date` option corresponds to the `date`
-    argument, and represents a filter that selects close approaches that occurred
-    on exactly that given date. Similarly, the `--min-distance` option
-    corresponds to the `distance_min` argument, and represents a filter that
-    selects close approaches whose nominal approach distance is at least that
-    far away from Earth. Each option is `None` if not specified at the command
-    line (in particular, this means that the `--not-hazardous` flag results in
-    `hazardous=False`, not to be confused with `hazardous=None`).
+            Each of these arguments is provided by the main module with a value from the
+            user's options at the command line. Each one corresponds to a different type
+            of filter. For example, the `--date` option corresponds to the `date`
+            argument, and represents a filter that selects close approaches that occurred
+            on exactly that given date. Similarly, the `--min-distance` option
+            corresponds to the `distance_min` argument, and represents a filter that
+            selects close approaches whose nominal approach distance is at least that
+            far away from Earth. Each option is `None` if not specified at the command
+            line (in particular, this means that the `--not-hazardous` flag results in
+            `hazardous=False`, not to be confused with `hazardous=None`).
 
-    The return value must be compatible with the `query` method of `NEODatabase`
-    because the main module directly passes this result to that method. For now,
-    this can be thought of as a collection of `AttributeFilter`s.
+            The return value must be compatible with the `query` method of `NEODatabase`
+            because the main module directly passes this result to that method. For now,
+            this can be thought of as a collection of `AttributeFilter`s.
 
-    :param date: A `date` on which a matching `CloseApproach` occurs.
-    :param start_date: A `date` on or after which a matching `CloseApproach` occurs.
-    :param end_date: A `date` on or before which a matching `CloseApproach` occurs.
-    :param distance_min: A minimum nominal approach distance for a matching `CloseApproach`.
-    :param distance_max: A maximum nominal approach distance for a matching `CloseApproach`.
-    :param velocity_min: A minimum relative approach velocity for a matching `CloseApproach`.
-    :param velocity_max: A maximum relative approach velocity for a matching `CloseApproach`.
-    :param diameter_min: A minimum diameter of the NEO of a matching `CloseApproach`.
-    :param diameter_max: A maximum diameter of the NEO of a matching `CloseApproach`.
-    :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
-    :return: A collection of filters for use with `query`.
-    """
+            :param date: A `date` on which a matching `CloseApproach` occurs.
+            :param start_date: A `date` on or after which a matching `CloseApproach` occurs.
+            :param end_date: A `date` on or before which a matching `CloseApproach` occurs.
+            :param distance_min: A minimum nominal approach distance for a matching `CloseApproach`.
+            :param distance_max: A maximum nominal approach distance for a matching `CloseApproach`.
+            :param velocity_min: A minimum relative approach velocity for a matching `CloseApproach`.
+            :param velocity_max: A maximum relative approach velocity for a matching `CloseApproach`.
+            :param diameter_min: A minimum diameter of the NEO of a matching `CloseApproach`.
+            :param diameter_max: A maximum diameter of the NEO of a matching `CloseApproach`.
+            :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
+            :return: A collection of filters for use with `query`.
+            """
     # TODO: Decide how you will represent your filters.
 
-    filter_dict = {}
+    filter_collection = []
+    if date:
+        filter_collection.append(DateTypeFilter(operator.eq,date))
+    if start_date:
+        filter_collection.append(DateTypeFilter(operator.ge, start_date))
+    if end_date:
+        filter_collection.append(DateTypeFilter(operator.le,end_date))
+    if diameter_min:
+        filter_collection.append(DiameterTypeFilter(operator.ge,diameter_min))
+    if diameter_max:
+        filter_collection.append(DiameterTypeFilter(operator.le,diameter_max))
+    if velocity_min:
+        filter_collection.append(VelocityTypeFilter(operator.ge,velocity_min))
+    if velocity_max:
+        filter_collection.append(VelocityTypeFilter(operator.le,velocity_max))
+    if distance_min:
+        filter_collection.append(DistanceTypeFilter(operator.ge, distance_min))
+    if distance_max:
+        filter_collection.append(DistanceTypeFilter(operator.le,distance_max))
+    if hazardous is not None:
+        filter_collection.append(HazardTypeFilter(operator.eq,hazardous))
+    print(filter_collection)
+    return filter_collection
 
-    filter_dict['date'] = date
-    filter_dict["start_date"] = start_date
-    filter_dict['end_date'] = end_date
-    filter_dict['distance_min'] = distance_min
-    filter_dict['distance_max'] = distance_max
-    filter_dict['velocity_min'] = velocity_min
-    filter_dict['velocity_max'] = velocity_max
-    filter_dict['diameter_min'] = diameter_min
-    filter_dict['distance_max'] = diameter_max
-    filter_dict['hazardous'] = hazardous
 
-    filters_key_list = list(filter_dict.keys())
-
-    for i in filters_key_list:
-        if filter_dict[i] == None:
-            filter_dict.pop(i)
-
-    return filter_dict
 
 
 def limit(iterator, n=None):
