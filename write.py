@@ -12,6 +12,7 @@ You'll edit this file in Part 4.
 """
 import csv
 import json
+from datetime import datetime, date
 
 
 def write_to_csv(results, filename):
@@ -31,19 +32,32 @@ def write_to_csv(results, filename):
     # TODO: Write the results to a CSV file, following the specification in the instructions.
 
     with open(filename, "w", newline="") as outfile:
+        #print(outfile)
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)
         writer.writeheader()
-        for result in results:
-            content = {**result, **result.neo}
-            if content["name"] is not None:
-                content["name"] = content["name"]
-            else:
-                content["name"] = ""
-            if content["potentially_hazardous"]:
-                content["potentially_hazardous"] = "True"
-            else:
-                content["potentially_hazardous"] = "False"
-            writer.writerow(content)
+        if results:
+            for result in results:
+                result_dict = {}
+                result_dict['datetime_utc'] = result.time
+                result_dict['distance_au'] = result.distance
+                result_dict['velocity_km_s'] = result.velocity
+                result_dict ['designation'] = result._designation
+                if result.neo.name is not None:
+                    result_dict['name'] = result.neo.name
+                else:
+                    result_dict['name'] = ""
+                if result.neo.diameter:
+                    result_dict ['diameter_km'] = result.neo.diameter
+                else:
+                    result_dict['diameter_km'] = ""
+                if result.neo.hazardous:
+                    result_dict ['potentially_hazardous'] = "True"
+                else:
+                    result_dict['potentially_hazardous'] = "False"
+
+                #print (result_dict['datetime_utc'])
+                writer.writerow(result_dict)
+
 
 def write_to_json(results, filename):
     """Write an iterable of `CloseApproach` objects to a JSON file.
@@ -60,25 +74,31 @@ def write_to_json(results, filename):
 
     data = []
     for result in results:
-        content = {**result, **result.neo}
-        if content["name"] is not None:
-            content["name"] = content["name"]
+        result_dict = {}
+        result_dict['datetime_utc'] = result.time
+        result_dict['distance_au'] = result.distance
+        result_dict['velocity_km_s'] = result.velocity
+        result_dict['neo'] = {}
+        result_dict["neo"]['designation'] = result.neo.designation
+        if result.neo.name is not None:
+            result_dict["neo"]['name'] = result.neo.name
         else:
-            content["name"] = ""
-        if content["potentially_hazardous"]:
-            content["potentially_hazardous"] = "True"
+            result_dict["neo"]['name'] = ""
+        if result.neo.diameter:
+            result_dict["neo"]['diameter_km'] = result.neo.diameter
         else:
-            content["potentially_hazardous"] = "False"
-        data.append(
-            {
-                "datetime_utc": content["datetime_utc"],
-                "distance_au": content["distance_au"],
-                "velocity_km_s": content["velocity_km_s"],
-                "neo": {
-                    "designation": content["designation"],
-                    "name": content["name"],
-                    "diameter_km": content["diameter_km"],
-                    "potentially_hazardous": content["potentially_hazardous"],
-                },
-            }
-        )
+            result_dict["neo"]['diameter_km'] = ""
+
+        result_dict["neo"]['potentially_hazardous'] = result.neo.hazardous
+        
+        data.append(result_dict)
+
+    class ComplexEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime):
+                return obj.strftime('%Y-%m-%d %H:%M')
+            else:
+                return json.JSONEncoder.default(self, obj)
+
+    with open(filename, "w") as outfile:
+        json.dump(data, outfile, cls=ComplexEncoder)
