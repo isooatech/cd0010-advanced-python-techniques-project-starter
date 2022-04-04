@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Explore a dataset of near-Earth objects and their close approaches to Earth.
+"""Explore a dataset of near-Earth objects
+and their close approaches to Earth.
 
 See `README.md` for a detailed discussion of this project.
 
@@ -7,14 +8,16 @@ This script can be invoked from the command line::
 
     $ python3 main.py {inspect,query,interactive} [args]
 
-The `inspect` subcommand looks up an NEO by name or by primary designation, and
+The `inspect` subcommand looks up an NEO by
+name or by primary designation, and
 optionally lists all of that NEO's known close approaches:
 
     $ python3 main.py inspect --pdes 1P
     $ python3 main.py inspect --name Halley
     $ python3 main.py inspect --verbose --name Halley
 
-The `query` subcommand searches for close approaches that match given criteria:
+The `query` subcommand searches for close
+approaches that match given criteria:
 
     $ python3 main.py query --date 1969-07-29
     $ python3 main.py query --start-date 2020-01-01 --end-date 2020-01-31 --max-distance 0.025

@@ -1,4 +1,5 @@
-"""Provide filters for querying close approaches and limit the generated results.
+"""Provide filters for querying close approaches
+and limit the generated results.
 
 The `create_filters` function produces a collection of objects that is used by
 the `query` method to generate a stream of `CloseApproach` objects that match
@@ -8,8 +9,8 @@ the main module and originate from the user's command-line options.
 This function can be thought to return a collection of instances of subclasses
 of `AttributeFilter` - a 1-argument callable (on a `CloseApproach`) constructed
 from a comparator (from the `operator` module), a reference value, and a class
-method `get` that subclasses can override to fetch an attribute of interest from
-the supplied `CloseApproach`.
+method `get` that subclasses can override to
+fetch an attribute of interest from the supplied `CloseApproach`.
 
 The `limit` function simply limits the maximum number of values produced by an
 iterator.
@@ -26,9 +27,10 @@ class UnsupportedCriterionError(NotImplementedError):
 class AttributeFilter:
     """A general superclass for filters on comparable attributes.
 
-    An `AttributeFilter` represents the search criteria pattern comparing some
-    attribute of a close approach (or its attached NEO) to a reference value. It
-    essentially functions as a callable predicate for whether a `CloseApproach`
+    An `AttributeFilter` represents the search criteria
+    pattern comparing some attribute of a close approach
+    (or its attached NEO) to a reference value. It essentially
+    functions as a callable predicate for whether a `CloseApproach`
     object satisfies the encoded criterion.
 
     It is constructed with a comparator operator and a reference value, and
@@ -39,7 +41,8 @@ class AttributeFilter:
     behavior to fetch a desired attribute from the given `CloseApproach`.
     """
     def __init__(self, op, value):
-        """Construct a new `AttributeFilter` from an binary predicate and a reference value.
+        """Construct a new `AttributeFilter` from an binary predicate
+        and a reference value.
 
         The reference value will be supplied as the second (right-hand side)
         argument to the operator function. For example, an `AttributeFilter`
@@ -63,33 +66,41 @@ class AttributeFilter:
         Concrete subclasses must override this method to get an attribute of
         interest from the supplied `CloseApproach`.
 
-        :param approach: A `CloseApproach` on which to evaluate this filter.
-        :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
+        :param approach:
+        A `CloseApproach` on which to evaluate this filter.
+        :return:
+        The value of an attribute of interest,
+        comparable to `self.value` via `self.op`.
         """
         raise UnsupportedCriterionError
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
+        return f"""{self.__class__.__name__}
+        (op=operator.{self.op.__name__}, value={self.value})"""
 
 
 class DateTypeFilter(AttributeFilter):
     """A subclass that creates objects of the date related filters"""
 
     @classmethod
-    def get(cls,approach):
-        """This will accept an approach object and return the time of the approach in the required format
+    def get(cls, approach):
+        """This will accept an approach object and
+        return the time of the approach in the required format
         Args: A close approach == approach
 
         Returns time in date format
         """
         return approach.time.date()
 
+
 class DistanceTypeFilter(AttributeFilter):
     """A subclass that creates objects of the distance related filters"""
 
     @classmethod
-    def get(cls,approach):
-        """This will accept an approach object and return the distance of the approach in the required format
+    def get(cls, approach):
+        """This will accept an approach object and return the distance
+        of the approach in the required format
+
                 Args: A close approach == approach
 
                 Returns the distance of the approach
@@ -103,7 +114,9 @@ class VelocityTypeFilter(AttributeFilter):
 
     @classmethod
     def get(cls, approach):
-        """This will accept an approach object and return the velocity of the approach in the required format
+        """This will accept an approach object and
+        return the velocity of the approach in the required format
+
                 Args: A close approach == approach
 
                 Returns the velocity of the approach
@@ -111,12 +124,14 @@ class VelocityTypeFilter(AttributeFilter):
 
         return approach.velocity
 
+
 class DiameterTypeFilter(AttributeFilter):
     """A subclass that creates objects of the diameter related filters"""
 
     @classmethod
     def get(cls, approach):
-        """This will accept an approach object and return the diameter of the approach in the required format
+        """This will accept an approach object
+        and return the diameter of the approach in the required format
                 Args: A close approach == approach
 
                 Returns the diameter of the approach
@@ -124,12 +139,14 @@ class DiameterTypeFilter(AttributeFilter):
 
         return approach.neo.diameter
 
+
 class HazardTypeFilter(AttributeFilter):
     """A subclass that creates objects of the hazard related filters"""
 
     @classmethod
     def get(cls, approach):
-        """This will accept an approach object and return the hazard status of the approach in the required format
+        """This will accept an approach object
+        and return the hazard status of the approach in the required format
                 Args: A close approach == approach
 
                 Returns the hazard status of the approach
@@ -137,68 +154,91 @@ class HazardTypeFilter(AttributeFilter):
 
         return approach.neo.hazardous
 
+
 def create_filters(
             date=None, start_date=None, end_date=None,
             distance_min=None, distance_max=None,
             velocity_min=None, velocity_max=None,
             diameter_min=None, diameter_max=None,
-            hazardous=None ):
+            hazardous=None):
     """Create a collection of filters from user-specified criteria.
 
-            Each of these arguments is provided by the main module with a value from the
-            user's options at the command line. Each one corresponds to a different type
-            of filter. For example, the `--date` option corresponds to the `date`
-            argument, and represents a filter that selects close approaches that occurred
-            on exactly that given date. Similarly, the `--min-distance` option
-            corresponds to the `distance_min` argument, and represents a filter that
-            selects close approaches whose nominal approach distance is at least that
-            far away from Earth. Each option is `None` if not specified at the command
-            line (in particular, this means that the `--not-hazardous` flag results in
-            `hazardous=False`, not to be confused with `hazardous=None`).
+            Each of these arguments is provided by the main
+            module with a value from the user's options at
+            the command line. Each one corresponds to a different type
+            of filter. For example, the `--date` option
+            corresponds to the `date` argument, and represents
+            a filter that selects close approaches that occurred
+            on exactly that given date. Similarly,
+            the `--min-distance` option corresponds to
+            the `distance_min` argument, and represents
+            a filter that selects close approaches
+            whose nominal approach distance is at least that
+            far away from Earth. Each option is `None`
+            if not specified at the command
+            line (in particular, this means that
+            the `--not-hazardous` flag results in
+            `hazardous=False`, not to be
+            confused with `hazardous=None`).
 
-            The return value must be compatible with the `query` method of `NEODatabase`
-            because the main module directly passes this result to that method. For now,
-            this can be thought of as a collection of `AttributeFilter`s.
+            The return value must be compatible with
+            the `query` method of `NEODatabase`
+            because the main module directly passes
+            this result to that method. For now,
+            this can be thought of as a
+            collection of `AttributeFilter`s.
 
-            :param date: A `date` on which a matching `CloseApproach` occurs.
-            :param start_date: A `date` on or after which a matching `CloseApproach` occurs.
-            :param end_date: A `date` on or before which a matching `CloseApproach` occurs.
-            :param distance_min: A minimum nominal approach distance for a matching `CloseApproach`.
-            :param distance_max: A maximum nominal approach distance for a matching `CloseApproach`.
-            :param velocity_min: A minimum relative approach velocity for a matching `CloseApproach`.
-            :param velocity_max: A maximum relative approach velocity for a matching `CloseApproach`.
-            :param diameter_min: A minimum diameter of the NEO of a matching `CloseApproach`.
-            :param diameter_max: A maximum diameter of the NEO of a matching `CloseApproach`.
-            :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
-            :return: A collection of filters for use with `query`.
+            :param date:
+            A `date` on which a matching `CloseApproach` occurs.
+            :param start_date:
+            A `date` on or after which a matching `CloseApproach` occurs.
+            :param end_date:
+            A `date` on or before which a matching `CloseApproach` occurs.
+            :param distance_min:
+            A minimum nominal approach distance for a matching `CloseApproach`.
+            :param distance_max:
+            A maximum nominal approach distance for a matching `CloseApproach`.
+            :param velocity_min:
+            A minimum relative approach velocity
+            for a matching `CloseApproach`.
+            :param velocity_max:
+            A maximum relative approach velocity
+            for a matching `CloseApproach`.
+            :param diameter_min:
+            A minimum diameter of the NEO of a matching `CloseApproach`.
+            :param diameter_max:
+            A maximum diameter of the NEO of a matching `CloseApproach`.
+            :param hazardous:
+            Whether the NEO of a matching `CloseApproach`
+            is potentially hazardous.
+            :return:
+            A collection of filters for use with `query`.
             """
     # TODO: Decide how you will represent your filters.
 
     filter_collection = []
     if date:
-        filter_collection.append(DateTypeFilter(operator.eq,date))
+        filter_collection.append(DateTypeFilter(operator.eq, date))
     if start_date:
         filter_collection.append(DateTypeFilter(operator.ge, start_date))
     if end_date:
-        filter_collection.append(DateTypeFilter(operator.le,end_date))
+        filter_collection.append(DateTypeFilter(operator.le, end_date))
     if diameter_min:
-        filter_collection.append(DiameterTypeFilter(operator.ge,diameter_min))
+        filter_collection.append(DiameterTypeFilter(operator.ge, diameter_min))
     if diameter_max:
-        filter_collection.append(DiameterTypeFilter(operator.le,diameter_max))
+        filter_collection.append(DiameterTypeFilter(operator.le, diameter_max))
     if velocity_min:
-        filter_collection.append(VelocityTypeFilter(operator.ge,velocity_min))
+        filter_collection.append(VelocityTypeFilter(operator.ge, velocity_min))
     if velocity_max:
-        filter_collection.append(VelocityTypeFilter(operator.le,velocity_max))
+        filter_collection.append(VelocityTypeFilter(operator.le, velocity_max))
     if distance_min:
         filter_collection.append(DistanceTypeFilter(operator.ge, distance_min))
     if distance_max:
-        filter_collection.append(DistanceTypeFilter(operator.le,distance_max))
+        filter_collection.append(DistanceTypeFilter(operator.le, distance_max))
     if hazardous is not None:
-        filter_collection.append(HazardTypeFilter(operator.eq,hazardous))
+        filter_collection.append(HazardTypeFilter(operator.eq, hazardous))
     print(filter_collection)
     return filter_collection
-
-
 
 
 def limit(iterator, n=None):
@@ -214,4 +254,4 @@ def limit(iterator, n=None):
 
     if n == 0 or n is None:
         return iterator
-    return [content for count, content in enumerate(iterator) if count<n]
+    return [content for count, content in enumerate(iterator) if count < n]

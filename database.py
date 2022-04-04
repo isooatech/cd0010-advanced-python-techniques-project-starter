@@ -1,4 +1,5 @@
-"""A database encapsulating collections of near-Earth objects and their close approaches.
+"""A database encapsulating collections of
+near-Earth objects and their close approaches.
 
 A `NEODatabase` holds an interconnected data set of NEOs and close approaches.
 It provides methods to fetch an NEO by primary designation or by name, as well
@@ -12,7 +13,8 @@ data on NEOs and close approaches extracted by `extract.load_neos` and
 You'll edit this file in Tasks 2 and 3.
 """
 
-#import extract
+# import extract
+
 
 class NEODatabase:
     """A database of near-Earth objects and their close approaches.
@@ -25,23 +27,26 @@ class NEODatabase:
     def __init__(self, neos, approaches):
         """Create a new `NEODatabase`.
 
-        As a precondition, this constructor assumes that the collections of NEOs
+        As a precondition, this constructor
+        assumes that the collections of NEOs
         and close approaches haven't yet been linked - that is, the
         `.approaches` attribute of each `NearEarthObject` resolves to an empty
         collection, and the `.neo` attribute of each `CloseApproach` is None.
 
         However, each `CloseApproach` has an attribute (`._designation`) that
         matches the `.designation` attribute of the corresponding NEO. This
-        constructor modifies the supplied NEOs and close approaches to link them
+        constructor modifies the supplied NEOs and
+        close approaches to link them
         together - after it's done, the `.approaches` attribute of each NEO has
-        a collection of that NEO's close approaches, and the `.neo` attribute of
+        a collection of that NEO's close approaches,
+        and the `.neo` attribute of
         each close approach references the appropriate NEO.
 
         :param neos: A collection of `NearEarthObject`s.
         :param approaches: A collection of `CloseApproach`es.
         """
         self._neos = neos
-        #print(len(self._neos), len(neos), type(self._neos))
+        # print(len(self._neos), len(neos), type(self._neos))
         self._approaches = approaches
 
         # TODO: What additional auxiliary data structures will be useful?
@@ -49,14 +54,12 @@ class NEODatabase:
 
         neo_ids = list(neo.designation for neo in self._neos)
 
-        #creating a id mapping of approaches and neos
+        # creating a id mapping of approaches and neos
 
-        approaches_id_mapping = {neo:[] for neo in neo_ids}
-        neos_id_mapping = {neo.designation:neo for neo in self._neos}
+        approaches_id_mapping = {neo: [] for neo in neo_ids}
+        neos_id_mapping = {neo.designation: neo for neo in self._neos}
 
-
-        # TODO: Link together the NEOs and their close approaches.
-
+        # TODO : Link together the NEOs and their close approaches.
         for approach in self._approaches:
             approaches_id_mapping[approach._designation].append(approach)
 
@@ -65,8 +68,6 @@ class NEODatabase:
 
         for approach in self._approaches:
             approach.neo = neos_id_mapping[approach._designation]
-
-
 
     def get_neo_by_designation(self, designation):
         """Find and return an NEO by its primary designation.
@@ -79,15 +80,14 @@ class NEODatabase:
         match is found.
 
         :param designation: The primary designation of the NEO to search for.
-        :return: The `NearEarthObject` with the desired primary designation, or `None`.
+        :return:
+        The `NearEarthObject` with the desired primary designation, or `None`.
         """
         # TODO: Fetch an NEO by its primary designation.
-
 
         for neo in self._neos:
             if neo.designation == designation:
                 return neo
-
 
     def get_neo_by_name(self, name):
         """Find and return an NEO by its name.
@@ -109,21 +109,23 @@ class NEODatabase:
             if neo.name == name:
                 return neo
 
-
-
     def query(self, filters=()):
-        """Query close approaches to generate those that match a collection of filters.
+        """Query close approaches to generate
+        those that match a collection of filters.
 
-        This generates a stream of `CloseApproach` objects that match all of the
-        provided filters.
+        This generates a stream of `CloseApproach`
+        objects that match all of the provided filters.
 
         If no arguments are provided, generate all known close approaches.
 
-        The `CloseApproach` objects are generated in internal order, which isn't
-        guaranteed to be sorted meaningfully, although is often sorted by time.
+        The `CloseApproach` objects are generated in internal order,
+        which isn't guaranteed to be sorted meaningfully,
+        although is often sorted by time.
 
-        :param filters: A collection of filters capturing user-specified criteria.
-        :return: A stream of matching `CloseApproach` objects.
+        :param filters:
+        A collection of filters capturing user-specified criteria.
+        :return:
+        A stream of matching `CloseApproach` objects.
         """
         # TODO: Generate `CloseApproach` objects that match all of the filters.
 
@@ -134,11 +136,3 @@ class NEODatabase:
         else:
             for approach in self._approaches:
                 yield approach
-
-
-"""n = extract.load_neos(r'data\neos.csv')
-a = extract.load_approaches('data\cad.json')
-
-y = NEODatabase(n,a)
-
-print(y.get_neo_by_designation('1865'))"""
