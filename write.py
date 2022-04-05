@@ -32,9 +32,6 @@ def write_to_csv(results, filename):
         'datetime_utc', 'distance_au', 'velocity_km_s',
         'designation', 'name', 'diameter_km', 'potentially_hazardous'
     )
-    # TODO: Write the results to a CSV file,
-    # following the specification in the instructions.
-
     with open(filename, "w", newline="") as outfile:
         # print(outfile)
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)
@@ -76,9 +73,6 @@ def write_to_json(results, filename):
     :param filename: A Path-like object pointing to
     where the data should be saved.
     """
-    # TODO: Write the results to a JSON file,
-    # following the specification in the instructions.
-
     data = []
     for result in results:
         result_dict = {}

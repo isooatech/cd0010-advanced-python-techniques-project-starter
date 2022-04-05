@@ -1,4 +1,5 @@
-"""A database encapsulating collections of
+"""A database encapsulating collections of.
+
 near-Earth objects and their close approaches.
 
 A `NEODatabase` holds an interconnected data set of NEOs and close approaches.
@@ -24,6 +25,7 @@ class NEODatabase:
     help fetch NEOs by primary designation or by name and to help speed up
     querying for close approaches that match criteria.
     """
+
     def __init__(self, neos, approaches):
         """Create a new `NEODatabase`.
 
@@ -49,7 +51,6 @@ class NEODatabase:
         # print(len(self._neos), len(neos), type(self._neos))
         self._approaches = approaches
 
-        # TODO: What additional auxiliary data structures will be useful?
         # Initializing a unique id
 
         neo_ids = list(neo.designation for neo in self._neos)
@@ -59,7 +60,6 @@ class NEODatabase:
         approaches_id_mapping = {neo: [] for neo in neo_ids}
         neos_id_mapping = {neo.designation: neo for neo in self._neos}
 
-        # TODO : Link together the NEOs and their close approaches.
         for approach in self._approaches:
             approaches_id_mapping[approach._designation].append(approach)
 
@@ -83,8 +83,6 @@ class NEODatabase:
         :return:
         The `NearEarthObject` with the desired primary designation, or `None`.
         """
-        # TODO: Fetch an NEO by its primary designation.
-
         for neo in self._neos:
             if neo.designation == designation:
                 return neo
@@ -103,14 +101,13 @@ class NEODatabase:
         :param name: The name, as a string, of the NEO to search for.
         :return: The `NearEarthObject` with the desired name, or `None`.
         """
-        # TODO: Fetch an NEO by its name.
-
         for neo in self._neos:
             if neo.name == name:
                 return neo
 
     def query(self, filters=()):
-        """Query close approaches to generate
+        """Query close approaches to generate.
+
         those that match a collection of filters.
 
         This generates a stream of `CloseApproach`
@@ -127,8 +124,6 @@ class NEODatabase:
         :return:
         A stream of matching `CloseApproach` objects.
         """
-        # TODO: Generate `CloseApproach` objects that match all of the filters.
-
         if filters:
             for approach in self._approaches:
                 if all(map(lambda f: f(approach), filters)):
